@@ -1,6 +1,7 @@
 import redis
 import json
 import time
+from db import conn,cursor
 
 redis_client = redis.Redis(
     host = "localhost",
@@ -28,7 +29,22 @@ def read():
                     json_event = event_data["event"]
                     event= json.loads(json_event)
                     print("Received event:", event)
-                    last_id = event_id
+                    cursor.execute(
+                    """
+                    INSERT INTO user_events (user_id, event_type, page, timestamp)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (
+                        event["user_id"],
+                        event["event_type"],
+                        event["page"],
+                        event["timestamp"]
+                    )
+                )
+
+                conn.commit()
+                print("Inserted into PostgreSQL")
+            last_id = event_id
                     
         
 if __name__ == "__main__":
