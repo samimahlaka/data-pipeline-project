@@ -2,6 +2,7 @@ import redis
 import json
 import time
 from db import conn,cursor
+import datetime
 
 redis_client = redis.Redis(
     host = "localhost",
@@ -29,6 +30,12 @@ def read():
                     json_event = event_data["event"]
                     event= json.loads(json_event)
                     print("Received event:", event)
+                    event["event_type"]=event["event_type"].lower().strip()
+                    event["page"] = event["page"].lower().strip()
+                    event["processed_at"] = datetime.utcnow().isoformat()
+                    if not event.get("user_id") or not event.get("event_type"):
+                        print("Invalid event skipped")
+                        continue
                     cursor.execute(
                     """
                     INSERT INTO user_events (user_id, event_type, page, timestamp)
