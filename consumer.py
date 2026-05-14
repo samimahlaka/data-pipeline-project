@@ -30,12 +30,17 @@ def read():
                     json_event = event_data["event"]
                     event= json.loads(json_event)
                     print("Received event:", event)
-                    event["event_type"]=event["event_type"].lower().strip()
+                    required_fields = ["user_id", "event_type", "page", "timestamp"]
+
+                    for field in required_fields:
+                        if field not in event or event[field] is None:
+                            print("Invalid event skipped:", event)
+                            continue
+
+                    # Transform event
+                    event["event_type"] = event["event_type"].lower().strip()
                     event["page"] = event["page"].lower().strip()
-                    event["processed_at"] = datetime.utcnow().isoformat()
-                    if not event.get("user_id") or not event.get("event_type"):
-                        print("Invalid event skipped")
-                        continue
+                    processed_at = datetime.utcnow()
                     cursor.execute(
                     """
                     INSERT INTO user_events (user_id, event_type, page, timestamp)
@@ -45,7 +50,8 @@ def read():
                         event["user_id"],
                         event["event_type"],
                         event["page"],
-                        event["timestamp"]
+                        event["timestamp"],
+                        processed_at
                     )
                 )
 
