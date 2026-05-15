@@ -1,11 +1,8 @@
 import psycopg2
+from config import POSTGRES_CONFIG
 
 conn= psycopg2.connect(
-    host = "localhost",
-    user="mahlaka",
-    password="",
-    port = 5432,
-    database="user_events_db"
+    **POSTGRES_CONFIG
     
 )
 cursor = conn.cursor()

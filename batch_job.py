@@ -1,4 +1,8 @@
 from db import conn, cursor
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 
 def run_daily_summary():
     cursor.execute("""
@@ -14,7 +18,7 @@ def run_daily_summary():
     """)
 
     conn.commit()
-    print("Daily summary generated successfully")
+    logging.info("Daily summary generated successfully")
 
 
 if __name__ == "__main__":
